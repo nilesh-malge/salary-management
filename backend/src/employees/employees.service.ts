@@ -28,6 +28,17 @@ export class EmployeesService {
     });
   }
 
+  async deactivate(id: number): Promise<Employee> {
+    return this.prisma.employee.update({
+      where: {
+        id,
+      },
+      data: {
+        status: EmployeeStatus.INACTIVE,
+      },
+    });
+  }
+
   async findAll({
     page,
     pageSize,

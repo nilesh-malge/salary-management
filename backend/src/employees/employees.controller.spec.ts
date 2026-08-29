@@ -10,6 +10,7 @@ describe('EmployeesController', () => {
     create: jest.fn(),
     findAll: jest.fn(),
     update: jest.fn(),
+    deactivate: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -85,6 +86,33 @@ describe('EmployeesController', () => {
       const result = await controller.update(1, updateData);
 
       expect(employeesServiceMock.update).toHaveBeenCalledWith(1, updateData);
+      expect(result).toEqual(response);
+    });
+  });
+
+  describe('deactivate', () => {
+    it('should deactivate an employee', async () => {
+      const response = {
+        id: 1,
+        employeeCode: 'EMP001',
+        firstName: 'Amit',
+        lastName: 'Sharma',
+        email: 'amit.sharma@example.com',
+        department: 'Engineering',
+        country: 'India',
+        jobTitle: 'Software Engineer',
+        salary: 1000000,
+        currencyCode: 'INR',
+        status: 'INACTIVE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      employeesServiceMock.deactivate.mockResolvedValue(response);
+
+      const result = await controller.deactivate(1);
+
+      expect(employeesServiceMock.deactivate).toHaveBeenCalledWith(1);
       expect(result).toEqual(response);
     });
   });

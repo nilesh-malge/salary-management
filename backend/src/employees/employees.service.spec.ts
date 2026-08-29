@@ -251,4 +251,37 @@ describe('EmployeesService', () => {
       expect(result.salary).toBe(1100000);
     });
   });
+
+  describe('deactivate', () => {
+    it('should mark an employee as inactive', async () => {
+      prismaMock.employee.update.mockResolvedValue({
+        id: 1,
+        employeeCode: 'EMP001',
+        firstName: 'Amit',
+        lastName: 'Sharma',
+        email: 'amit.sharma@example.com',
+        department: 'Engineering',
+        country: 'India',
+        jobTitle: 'Software Engineer',
+        salary: 1000000,
+        currencyCode: 'INR',
+        status: 'INACTIVE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const result = await service.deactivate(1);
+
+      expect(prismaMock.employee.update).toHaveBeenCalledWith({
+        where: {
+          id: 1,
+        },
+        data: {
+          status: 'INACTIVE',
+        },
+      });
+
+      expect(result.status).toBe('INACTIVE');
+    });
+  });
 });
