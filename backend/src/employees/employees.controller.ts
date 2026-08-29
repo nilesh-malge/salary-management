@@ -1,6 +1,16 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { ListEmployeesQueryDto } from './dto/list-employees-query.dto';
 import type { Employee } from '../../generated/prisma/client';
 
@@ -25,5 +35,13 @@ export class EmployeesController {
       sortBy: query.sortBy,
       sortOrder: query.sortOrder,
     });
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdateEmployeeDto,
+  ) {
+    return this.employeesService.update(id, data);
   }
 }

@@ -11,6 +11,7 @@ describe('EmployeesService', () => {
       create: jest.fn(),
       findMany: jest.fn(),
       count: jest.fn(),
+      update: jest.fn(),
     },
   };
 
@@ -211,6 +212,43 @@ describe('EmployeesService', () => {
           salary: 'desc',
         },
       });
+    });
+  });
+
+  describe('update', () => {
+    it('should update an employee', async () => {
+      const updateData = {
+        jobTitle: 'Senior Software Engineer',
+        salary: 1100000,
+      };
+
+      prismaMock.employee.update.mockResolvedValue({
+        id: 1,
+        employeeCode: 'EMP001',
+        firstName: 'Amit',
+        lastName: 'Sharma',
+        email: 'amit.sharma@example.com',
+        department: 'Engineering',
+        country: 'India',
+        jobTitle: 'Senior Software Engineer',
+        salary: 1100000,
+        currencyCode: 'INR',
+        status: 'ACTIVE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const result = await service.update(1, updateData);
+
+      expect(prismaMock.employee.update).toHaveBeenCalledWith({
+        where: {
+          id: 1,
+        },
+        data: updateData,
+      });
+
+      expect(result.jobTitle).toBe('Senior Software Engineer');
+      expect(result.salary).toBe(1100000);
     });
   });
 });

@@ -9,6 +9,7 @@ describe('EmployeesController', () => {
   const employeesServiceMock = {
     create: jest.fn(),
     findAll: jest.fn(),
+    update: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -53,6 +54,38 @@ describe('EmployeesController', () => {
 
       expect(employeesServiceMock.create).toHaveBeenCalledWith(employeeData);
       expect(result.employeeCode).toBe('EMP001');
+    });
+  });
+
+  describe('update', () => {
+    it('should update an employee', async () => {
+      const updateData = {
+        jobTitle: 'Senior Software Engineer',
+        salary: 1100000,
+      };
+
+      const response = {
+        id: 1,
+        employeeCode: 'EMP001',
+        firstName: 'Amit',
+        lastName: 'Sharma',
+        email: 'amit.sharma@example.com',
+        department: 'Engineering',
+        country: 'India',
+        jobTitle: 'Senior Software Engineer',
+        salary: 1100000,
+        currencyCode: 'INR',
+        status: 'ACTIVE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      employeesServiceMock.update.mockResolvedValue(response);
+
+      const result = await controller.update(1, updateData);
+
+      expect(employeesServiceMock.update).toHaveBeenCalledWith(1, updateData);
+      expect(result).toEqual(response);
     });
   });
 
