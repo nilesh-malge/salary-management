@@ -15,4 +15,16 @@ describe('ListEmployeesQueryDto', () => {
     expect(dto.page).toBe(2);
     expect(dto.pageSize).toBe(20);
   });
+
+  it('should reject a non-string search value', async () => {
+    const dto = plainToInstance(ListEmployeesQueryDto, {
+      page: '1',
+      pageSize: '10',
+      search: 123,
+    });
+
+    const errors = await validate(dto);
+
+    expect(errors.length).toBeGreaterThan(0);
+  });
 });

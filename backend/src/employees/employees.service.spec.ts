@@ -104,5 +104,54 @@ describe('EmployeesService', () => {
         totalPages: 1,
       });
     });
+
+    it('should search employees by employee code, name or email', async () => {
+      prismaMock.employee.findMany.mockResolvedValue([]);
+      prismaMock.employee.count.mockResolvedValue(0);
+
+      await service.findAll(1, 10, 'amit');
+
+      const where = {
+        OR: [
+          {
+            employeeCode: {
+              contains: 'amit',
+              mode: 'insensitive',
+            },
+          },
+          {
+            firstName: {
+              contains: 'amit',
+              mode: 'insensitive',
+            },
+          },
+          {
+            lastName: {
+              contains: 'amit',
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: 'amit',
+              mode: 'insensitive',
+            },
+          },
+        ],
+      };
+
+      expect(prismaMock.employee.findMany).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        orderBy: {
+          id: 'asc',
+        },
+        where,
+      });
+
+      expect(prismaMock.employee.count).toHaveBeenCalledWith({
+        where,
+      });
+    });
   });
 });

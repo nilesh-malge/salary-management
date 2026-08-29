@@ -15,6 +15,10 @@ export class EmployeesController {
 
   @Get()
   async findAll(@Query() query: ListEmployeesQueryDto) {
-    return this.employeesService.findAll(query.page, query.pageSize);
+    return this.employeesService.findAll(
+      query.page,
+      query.pageSize,
+      query.search,
+    );
   }
 }

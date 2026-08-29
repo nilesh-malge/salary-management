@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsInt, Max, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class ListEmployeesQueryDto {
   @Type(() => Number)
@@ -12,4 +12,8 @@ export class ListEmployeesQueryDto {
   @Min(1)
   @Max(100)
   pageSize = 10;
+
+  @IsOptional()
+  @IsString()
+  search?: string;
 }

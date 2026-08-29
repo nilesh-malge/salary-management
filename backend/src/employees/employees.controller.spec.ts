@@ -88,8 +88,31 @@ describe('EmployeesController', () => {
         pageSize: 10,
       });
 
-      expect(employeesServiceMock.findAll).toHaveBeenCalledWith(1, 10);
+      expect(employeesServiceMock.findAll).toHaveBeenCalledWith(
+        1,
+        10,
+        undefined,
+      );
       expect(result).toEqual(response);
+    });
+    it('should pass search to the service', async () => {
+      const response = {
+        data: [],
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0,
+      };
+
+      employeesServiceMock.findAll.mockResolvedValue(response);
+
+      await controller.findAll({
+        page: 1,
+        pageSize: 10,
+        search: 'amit',
+      });
+
+      expect(employeesServiceMock.findAll).toHaveBeenCalledWith(1, 10, 'amit');
     });
   });
 });

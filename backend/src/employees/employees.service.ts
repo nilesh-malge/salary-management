@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
-import type { Employee } from '../../generated/prisma/client';
+import type { Employee, Prisma } from '../../generated/prisma/client';
 
 @Injectable()
 export class EmployeesService {
@@ -13,8 +13,39 @@ export class EmployeesService {
     });
   }
 
-  async findAll(page: number, pageSize: number) {
+  async findAll(page: number, pageSize: number, search?: string) {
     const skip = (page - 1) * pageSize;
+
+    const where: Prisma.EmployeeWhereInput | undefined = search
+      ? {
+          OR: [
+            {
+              employeeCode: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              firstName: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              lastName: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              email: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        }
+      : undefined;
 
     const [employees, total] = await Promise.all([
       this.prisma.employee.findMany({
@@ -23,8 +54,11 @@ export class EmployeesService {
         orderBy: {
           id: 'asc',
         },
+        ...(where && { where }),
       }),
-      this.prisma.employee.count(),
+      this.prisma.employee.count({
+        ...(where && { where }),
+      }),
     ]);
 
     return {
