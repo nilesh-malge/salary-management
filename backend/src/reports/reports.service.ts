@@ -1,0 +1,41 @@
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '../../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class ReportsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async getPayrollSummary() {
+    const result = await this.prisma.$queryRaw<
+      {
+        totalPayroll: number;
+        averageSalary: number;
+        medianSalary: number;
+        employeeCount: number;
+      }[]
+    >(Prisma.sql`
+      SELECT
+        COALESCE(SUM(e.salary * r."rateToBase"), 0)::float AS "totalPayroll",
+        COALESCE(AVG(e.salary * r."rateToBase"), 0)::float AS "averageSalary",
+        COALESCE(
+          PERCENTILE_CONT(0.5) WITHIN GROUP (
+            ORDER BY e.salary * r."rateToBase"
+          ),
+          0
+        )::float AS "medianSalary",
+        COUNT(*)::int AS "employeeCount"
+      FROM "Employee" e
+      JOIN "ExchangeRate" r
+        ON r."currencyCode" = e."currencyCode"
+      WHERE e.status = 'ACTIVE'
+    `);
+
+    const summary = result[0];
+
+    return {
+      ...summary,
+      currencyCode: 'INR',
+    };
+  }
+}

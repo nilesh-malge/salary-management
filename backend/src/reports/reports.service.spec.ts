@@ -1,0 +1,73 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaService } from '../prisma/prisma.service';
+import { ReportsService } from './reports.service';
+
+describe('ReportsService', () => {
+  let service: ReportsService;
+
+  const prisma = {
+    $queryRaw: jest.fn(),
+  };
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ReportsService,
+        {
+          provide: PrismaService,
+          useValue: prisma,
+        },
+      ],
+    }).compile();
+
+    service = module.get<ReportsService>(ReportsService);
+
+    jest.clearAllMocks();
+  });
+
+  describe('getPayrollSummary', () => {
+    it('returns payroll summary for active employees in INR', async () => {
+      prisma.$queryRaw.mockResolvedValue([
+        {
+          totalPayroll: 12500000,
+          averageSalary: 750000,
+          medianSalary: 700000,
+          employeeCount: 20,
+        },
+      ]);
+
+      const result = await service.getPayrollSummary();
+
+      expect(result).toEqual({
+        totalPayroll: 12500000,
+        averageSalary: 750000,
+        medianSalary: 700000,
+        employeeCount: 20,
+        currencyCode: 'INR',
+      });
+
+      expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns zero values when there are no active employees', async () => {
+      prisma.$queryRaw.mockResolvedValue([
+        {
+          totalPayroll: 0,
+          averageSalary: 0,
+          medianSalary: 0,
+          employeeCount: 0,
+        },
+      ]);
+
+      const result = await service.getPayrollSummary();
+
+      expect(result).toEqual({
+        totalPayroll: 0,
+        averageSalary: 0,
+        medianSalary: 0,
+        employeeCount: 0,
+        currencyCode: 'INR',
+      });
+    });
+  });
+});
