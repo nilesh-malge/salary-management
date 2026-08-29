@@ -60,12 +60,77 @@ const departmentRoles = {
 } as const;
 
 const salaryRanges = {
-  INR: { min: 400000, max: 3000000 },
-  USD: { min: 45000, max: 180000 },
-  EUR: { min: 40000, max: 140000 },
-  GBP: { min: 38000, max: 130000 },
-  AED: { min: 80000, max: 350000 },
+  India: {
+    Engineering: { min: 600000, max: 3200000 },
+    Product: { min: 800000, max: 3000000 },
+    Finance: { min: 500000, max: 2000000 },
+    HR: { min: 400000, max: 1800000 },
+    Sales: { min: 400000, max: 2200000 },
+    Marketing: { min: 400000, max: 2000000 },
+    Operations: { min: 400000, max: 1600000 },
+    'Customer Support': { min: 350000, max: 1200000 },
+  },
+  'United States': {
+    Engineering: { min: 70000, max: 180000 },
+    Product: { min: 75000, max: 170000 },
+    Finance: { min: 55000, max: 130000 },
+    HR: { min: 50000, max: 120000 },
+    Sales: { min: 50000, max: 145000 },
+    Marketing: { min: 50000, max: 135000 },
+    Operations: { min: 45000, max: 110000 },
+    'Customer Support': { min: 38000, max: 85000 },
+  },
+  Germany: {
+    Engineering: { min: 55000, max: 120000 },
+    Product: { min: 55000, max: 115000 },
+    Finance: { min: 45000, max: 95000 },
+    HR: { min: 42000, max: 90000 },
+    Sales: { min: 42000, max: 100000 },
+    Marketing: { min: 42000, max: 95000 },
+    Operations: { min: 40000, max: 85000 },
+    'Customer Support': { min: 35000, max: 70000 },
+  },
+  'United Kingdom': {
+    Engineering: { min: 50000, max: 110000 },
+    Product: { min: 50000, max: 105000 },
+    Finance: { min: 40000, max: 90000 },
+    HR: { min: 38000, max: 85000 },
+    Sales: { min: 38000, max: 95000 },
+    Marketing: { min: 38000, max: 90000 },
+    Operations: { min: 36000, max: 80000 },
+    'Customer Support': { min: 30000, max: 65000 },
+  },
+  'United Arab Emirates': {
+    Engineering: { min: 120000, max: 320000 },
+    Product: { min: 130000, max: 300000 },
+    Finance: { min: 100000, max: 240000 },
+    HR: { min: 90000, max: 220000 },
+    Sales: { min: 90000, max: 260000 },
+    Marketing: { min: 90000, max: 230000 },
+    Operations: { min: 85000, max: 200000 },
+    'Customer Support': { min: 70000, max: 160000 },
+  },
 } as const;
+
+function getRoleLevel(jobTitle: string) {
+  if (jobTitle === 'Account Manager') {
+    return 0.6;
+  }
+
+  if (jobTitle.includes('Manager')) {
+    return 0.8;
+  }
+
+  if (
+    jobTitle.includes('Senior') ||
+    jobTitle.includes('Specialist') ||
+    jobTitle.includes('Business Partner')
+  ) {
+    return 0.6;
+  }
+
+  return 0.35;
+}
 
 const firstNames = [
   'Amit',
@@ -117,13 +182,33 @@ const departments = Object.keys(departmentRoles) as Array<
   keyof typeof departmentRoles
 >;
 
-function getSalary(index: number, currencyCode: keyof typeof salaryRanges) {
-  const range = salaryRanges[currencyCode];
+function getSalary(
+  index: number,
+  country: keyof typeof salaryRanges,
+  department: keyof (typeof salaryRanges)[keyof typeof salaryRanges],
+  jobTitle: string,
+) {
+  const range = salaryRanges[country][department];
   const span = range.max - range.min;
 
-  const salary = range.min + ((index * 7919) % span);
+  const roleLevel = getRoleLevel(jobTitle);
+
+  const variation = ((index * 7919) % 1000) / 1000;
+
+  const positionInRange = Math.min(roleLevel + variation * 0.2, 0.95);
+
+  const salary = range.min + span * positionInRange;
 
   return Math.round(salary / 1000) * 1000;
+}
+
+function getEmployeeStatus(index: number) {
+  const block = Math.floor(index / 20);
+  const positionInBlock = index % 20;
+
+  return positionInBlock === block % 20
+    ? EmployeeStatus.INACTIVE
+    : EmployeeStatus.ACTIVE;
 }
 
 function buildEmployees(count: number) {
@@ -149,12 +234,9 @@ function buildEmployees(count: number) {
       department,
       country: location.country,
       jobTitle,
-      salary: getSalary(employeeNumber, location.currencyCode),
+      salary: getSalary(employeeNumber, location.country, department, jobTitle),
       currencyCode: location.currencyCode,
-      status:
-        employeeNumber % 20 === 0
-          ? EmployeeStatus.INACTIVE
-          : EmployeeStatus.ACTIVE,
+      status: getEmployeeStatus(index),
     };
   });
 }
