@@ -27,4 +27,17 @@ describe('ListEmployeesQueryDto', () => {
 
     expect(errors.length).toBeGreaterThan(0);
   });
+  it('should reject an invalid employee status', async () => {
+    const dto = plainToInstance(ListEmployeesQueryDto, {
+      page: '1',
+      pageSize: '10',
+      department: 'Engineering',
+      country: 'India',
+      status: 'UNKNOWN',
+    });
+
+    const errors = await validate(dto);
+
+    expect(errors.length).toBeGreaterThan(0);
+  });
 });

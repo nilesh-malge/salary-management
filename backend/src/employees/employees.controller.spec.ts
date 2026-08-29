@@ -94,6 +94,7 @@ describe('EmployeesController', () => {
       });
       expect(result).toEqual(response);
     });
+
     it('should pass search to the service', async () => {
       const response = {
         data: [],
@@ -115,6 +116,34 @@ describe('EmployeesController', () => {
         page: 1,
         pageSize: 10,
         search: 'amit',
+      });
+    });
+
+    it('should pass filters to the service', async () => {
+      const response = {
+        data: [],
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0,
+      };
+
+      employeesServiceMock.findAll.mockResolvedValue(response);
+
+      await controller.findAll({
+        page: 1,
+        pageSize: 10,
+        department: 'Engineering',
+        country: 'India',
+        status: 'ACTIVE',
+      });
+
+      expect(employeesServiceMock.findAll).toHaveBeenCalledWith({
+        page: 1,
+        pageSize: 10,
+        department: 'Engineering',
+        country: 'India',
+        status: 'ACTIVE',
       });
     });
   });

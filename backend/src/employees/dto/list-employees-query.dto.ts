@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { EmployeeStatus } from '../../../generated/prisma/client';
 
 export class ListEmployeesQueryDto {
   @Type(() => Number)
@@ -16,4 +17,16 @@ export class ListEmployeesQueryDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @IsOptional()
+  @IsString()
+  department?: string;
+
+  @IsOptional()
+  @IsString()
+  country?: string;
+
+  @IsOptional()
+  @IsEnum(EmployeeStatus)
+  status?: EmployeeStatus;
 }

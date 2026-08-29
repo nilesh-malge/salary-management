@@ -160,5 +160,36 @@ describe('EmployeesService', () => {
         where,
       });
     });
+    it('should filter employees by department, country and status', async () => {
+      prismaMock.employee.findMany.mockResolvedValue([]);
+      prismaMock.employee.count.mockResolvedValue(0);
+
+      await service.findAll({
+        page: 1,
+        pageSize: 10,
+        department: 'Engineering',
+        country: 'India',
+        status: 'ACTIVE',
+      });
+
+      const where = {
+        department: 'Engineering',
+        country: 'India',
+        status: 'ACTIVE',
+      };
+
+      expect(prismaMock.employee.findMany).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        orderBy: {
+          id: 'asc',
+        },
+        where,
+      });
+
+      expect(prismaMock.employee.count).toHaveBeenCalledWith({
+        where,
+      });
+    });
   });
 });

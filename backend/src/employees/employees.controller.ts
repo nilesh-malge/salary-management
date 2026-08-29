@@ -19,6 +19,9 @@ export class EmployeesController {
       page: query.page,
       pageSize: query.pageSize,
       search: query.search,
+      department: query.department,
+      country: query.country,
+      status: query.status,
     });
   }
 }
