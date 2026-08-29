@@ -1,0 +1,14 @@
+import { Body, Controller, Post } from '@nestjs/common';
+import { EmployeesService } from './employees.service';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import type { Employee } from '../../generated/prisma/client';
+
+@Controller('employees')
+export class EmployeesController {
+  constructor(private readonly employeesService: EmployeesService) {}
+
+  @Post()
+  async create(@Body() data: CreateEmployeeDto): Promise<Employee> {
+    return this.employeesService.create(data);
+  }
+}
