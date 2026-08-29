@@ -8,6 +8,8 @@ describe('EmployeesService', () => {
   const prismaMock = {
     employee: {
       create: jest.fn(),
+      findMany: jest.fn(),
+      count: jest.fn(),
     },
   };
 
@@ -56,6 +58,51 @@ describe('EmployeesService', () => {
       });
 
       expect(result.employeeCode).toBe('EMP001');
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return paginated employees', async () => {
+      const employees = [
+        {
+          id: 1,
+          employeeCode: 'EMP001',
+          firstName: 'Amit',
+          lastName: 'Sharma',
+          email: 'amit.sharma@example.com',
+          department: 'Engineering',
+          country: 'India',
+          jobTitle: 'Software Engineer',
+          salary: 900000,
+          currencyCode: 'INR',
+          status: 'ACTIVE',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      prismaMock.employee.findMany.mockResolvedValue(employees);
+      prismaMock.employee.count.mockResolvedValue(1);
+
+      const result = await service.findAll(1, 10);
+
+      expect(prismaMock.employee.findMany).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        orderBy: {
+          id: 'asc',
+        },
+      });
+
+      expect(prismaMock.employee.count).toHaveBeenCalled();
+
+      expect(result).toEqual({
+        data: employees,
+        page: 1,
+        pageSize: 10,
+        total: 1,
+        totalPages: 1,
+      });
     });
   });
 });

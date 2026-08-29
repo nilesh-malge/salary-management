@@ -12,4 +12,27 @@ export class EmployeesService {
       data,
     });
   }
+
+  async findAll(page: number, pageSize: number) {
+    const skip = (page - 1) * pageSize;
+
+    const [employees, total] = await Promise.all([
+      this.prisma.employee.findMany({
+        skip,
+        take: pageSize,
+        orderBy: {
+          id: 'asc',
+        },
+      }),
+      this.prisma.employee.count(),
+    ]);
+
+    return {
+      data: employees,
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
 }

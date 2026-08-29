@@ -7,6 +7,7 @@ describe('EmployeesController', () => {
 
   const employeesServiceMock = {
     create: jest.fn(),
+    findAll: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -51,6 +52,44 @@ describe('EmployeesController', () => {
 
       expect(employeesServiceMock.create).toHaveBeenCalledWith(employeeData);
       expect(result.employeeCode).toBe('EMP001');
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return paginated employees', async () => {
+      const response = {
+        data: [
+          {
+            id: 1,
+            employeeCode: 'EMP001',
+            firstName: 'Amit',
+            lastName: 'Sharma',
+            email: 'amit.sharma@example.com',
+            department: 'Engineering',
+            country: 'India',
+            jobTitle: 'Software Engineer',
+            salary: 900000,
+            currencyCode: 'INR',
+            status: 'ACTIVE',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+        page: 1,
+        pageSize: 10,
+        total: 1,
+        totalPages: 1,
+      };
+
+      employeesServiceMock.findAll.mockResolvedValue(response);
+
+      const result = await controller.findAll({
+        page: 1,
+        pageSize: 10,
+      });
+
+      expect(employeesServiceMock.findAll).toHaveBeenCalledWith(1, 10);
+      expect(result).toEqual(response);
     });
   });
 });
