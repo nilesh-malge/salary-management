@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EmployeesController } from './employees.controller';
 import { EmployeesService } from './employees.service';
+import { EmployeeSortField, SortOrder } from './dto/list-employees-query.dto';
 
 describe('EmployeesController', () => {
   let controller: EmployeesController;
@@ -144,6 +145,32 @@ describe('EmployeesController', () => {
         department: 'Engineering',
         country: 'India',
         status: 'ACTIVE',
+      });
+    });
+
+    it('should pass sorting options to the service', async () => {
+      const response = {
+        data: [],
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0,
+      };
+
+      employeesServiceMock.findAll.mockResolvedValue(response);
+
+      await controller.findAll({
+        page: 1,
+        pageSize: 10,
+        sortBy: EmployeeSortField.SALARY,
+        sortOrder: SortOrder.DESC,
+      });
+
+      expect(employeesServiceMock.findAll).toHaveBeenCalledWith({
+        page: 1,
+        pageSize: 10,
+        sortBy: EmployeeSortField.SALARY,
+        sortOrder: SortOrder.DESC,
       });
     });
   });

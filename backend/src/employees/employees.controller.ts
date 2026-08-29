@@ -22,6 +22,8 @@ export class EmployeesController {
       department: query.department,
       country: query.country,
       status: query.status,
+      sortBy: query.sortBy,
+      sortOrder: query.sortOrder,
     });
   }
 }

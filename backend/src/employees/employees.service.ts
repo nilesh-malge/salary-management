@@ -6,6 +6,7 @@ import {
   type Employee,
   type Prisma,
 } from '../../generated/prisma/client';
+import { EmployeeSortField, SortOrder } from './dto/list-employees-query.dto';
 
 @Injectable()
 export class EmployeesService {
@@ -24,6 +25,8 @@ export class EmployeesService {
     department,
     country,
     status,
+    sortBy,
+    sortOrder,
   }: {
     page: number;
     pageSize: number;
@@ -31,6 +34,8 @@ export class EmployeesService {
     department?: string;
     country?: string;
     status?: EmployeeStatus;
+    sortBy?: EmployeeSortField;
+    sortOrder?: SortOrder;
   }) {
     const skip = (page - 1) * pageSize;
 
@@ -68,13 +73,19 @@ export class EmployeesService {
       }),
     };
 
+    const orderBy: Prisma.EmployeeOrderByWithRelationInput = sortBy
+      ? {
+          [sortBy]: sortOrder ?? SortOrder.ASC,
+        }
+      : {
+          id: 'asc',
+        };
+
     const [employees, total] = await Promise.all([
       this.prisma.employee.findMany({
         skip,
         take: pageSize,
-        orderBy: {
-          id: 'asc',
-        },
+        orderBy,
         ...(Object.keys(where).length > 0 && { where }),
       }),
       this.prisma.employee.count({

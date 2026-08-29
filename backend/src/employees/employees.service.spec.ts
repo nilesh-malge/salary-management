@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EmployeesService } from './employees.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { EmployeesService } from './employees.service';
+import { EmployeeSortField, SortOrder } from './dto/list-employees-query.dto';
 
 describe('EmployeesService', () => {
   let service: EmployeesService;
@@ -189,6 +190,26 @@ describe('EmployeesService', () => {
 
       expect(prismaMock.employee.count).toHaveBeenCalledWith({
         where,
+      });
+    });
+
+    it('should sort employees by the requested field and direction', async () => {
+      prismaMock.employee.findMany.mockResolvedValue([]);
+      prismaMock.employee.count.mockResolvedValue(0);
+
+      await service.findAll({
+        page: 1,
+        pageSize: 10,
+        sortBy: EmployeeSortField.SALARY,
+        sortOrder: SortOrder.DESC,
+      });
+
+      expect(prismaMock.employee.findMany).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        orderBy: {
+          salary: 'desc',
+        },
       });
     });
   });

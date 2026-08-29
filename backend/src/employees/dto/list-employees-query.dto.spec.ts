@@ -27,6 +27,7 @@ describe('ListEmployeesQueryDto', () => {
 
     expect(errors.length).toBeGreaterThan(0);
   });
+
   it('should reject an invalid employee status', async () => {
     const dto = plainToInstance(ListEmployeesQueryDto, {
       page: '1',
@@ -34,6 +35,19 @@ describe('ListEmployeesQueryDto', () => {
       department: 'Engineering',
       country: 'India',
       status: 'UNKNOWN',
+    });
+
+    const errors = await validate(dto);
+
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it('should reject an invalid sort direction', async () => {
+    const dto = plainToInstance(ListEmployeesQueryDto, {
+      page: '1',
+      pageSize: '10',
+      sortBy: 'salary',
+      sortOrder: 'random',
     });
 
     const errors = await validate(dto);

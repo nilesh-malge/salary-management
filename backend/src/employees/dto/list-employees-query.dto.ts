@@ -2,6 +2,20 @@ import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { EmployeeStatus } from '../../../generated/prisma/client';
 
+export enum EmployeeSortField {
+  EMPLOYEE_CODE = 'employeeCode',
+  FIRST_NAME = 'firstName',
+  LAST_NAME = 'lastName',
+  DEPARTMENT = 'department',
+  COUNTRY = 'country',
+  SALARY = 'salary',
+}
+
+export enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
 export class ListEmployeesQueryDto {
   @Type(() => Number)
   @IsInt()
@@ -29,4 +43,12 @@ export class ListEmployeesQueryDto {
   @IsOptional()
   @IsEnum(EmployeeStatus)
   status?: EmployeeStatus;
+
+  @IsOptional()
+  @IsEnum(EmployeeSortField)
+  sortBy?: EmployeeSortField;
+
+  @IsOptional()
+  @IsEnum(SortOrder)
+  sortOrder?: SortOrder;
 }
