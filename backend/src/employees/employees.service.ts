@@ -13,7 +13,15 @@ export class EmployeesService {
     });
   }
 
-  async findAll(page: number, pageSize: number, search?: string) {
+  async findAll({
+    page,
+    pageSize,
+    search,
+  }: {
+    page: number;
+    pageSize: number;
+    search?: string;
+  }) {
     const skip = (page - 1) * pageSize;
 
     const where: Prisma.EmployeeWhereInput | undefined = search

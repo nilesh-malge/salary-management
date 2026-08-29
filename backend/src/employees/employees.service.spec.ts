@@ -84,7 +84,10 @@ describe('EmployeesService', () => {
       prismaMock.employee.findMany.mockResolvedValue(employees);
       prismaMock.employee.count.mockResolvedValue(1);
 
-      const result = await service.findAll(1, 10);
+      const result = await service.findAll({
+        page: 1,
+        pageSize: 10,
+      });
 
       expect(prismaMock.employee.findMany).toHaveBeenCalledWith({
         skip: 0,
@@ -109,7 +112,11 @@ describe('EmployeesService', () => {
       prismaMock.employee.findMany.mockResolvedValue([]);
       prismaMock.employee.count.mockResolvedValue(0);
 
-      await service.findAll(1, 10, 'amit');
+      await service.findAll({
+        page: 1,
+        pageSize: 10,
+        search: 'amit',
+      });
 
       const where = {
         OR: [

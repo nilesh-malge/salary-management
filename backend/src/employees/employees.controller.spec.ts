@@ -88,11 +88,10 @@ describe('EmployeesController', () => {
         pageSize: 10,
       });
 
-      expect(employeesServiceMock.findAll).toHaveBeenCalledWith(
-        1,
-        10,
-        undefined,
-      );
+      expect(employeesServiceMock.findAll).toHaveBeenCalledWith({
+        page: 1,
+        pageSize: 10,
+      });
       expect(result).toEqual(response);
     });
     it('should pass search to the service', async () => {
@@ -112,7 +111,11 @@ describe('EmployeesController', () => {
         search: 'amit',
       });
 
-      expect(employeesServiceMock.findAll).toHaveBeenCalledWith(1, 10, 'amit');
+      expect(employeesServiceMock.findAll).toHaveBeenCalledWith({
+        page: 1,
+        pageSize: 10,
+        search: 'amit',
+      });
     });
   });
 });
