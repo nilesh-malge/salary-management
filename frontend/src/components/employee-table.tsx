@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getEmployees } from "@/lib/employees-api";
+import {
+  activateEmployee,
+  deactivateEmployee,
+  getEmployees,
+} from "@/lib/employees-api";
 import type {
   Employee,
   EmployeeListResponse,
@@ -39,6 +43,52 @@ export function EmployeeTable({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [reloadKey, setReloadKey] = useState(0);
+
+  async function handleDeactivate(employee: Employee) {
+    const confirmed = window.confirm(
+      `Deactivate ${employee.firstName} ${employee.lastName}?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deactivateEmployee(employee.id);
+      setPage(1);
+      setReloadKey((current) => current + 1);
+    } catch (error) {
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : "Employee could not be deactivated.",
+      );
+    }
+  }
+
+  async function handleActivate(employee: Employee) {
+    const confirmed = window.confirm(
+      `Activate ${employee.firstName} ${employee.lastName}?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await activateEmployee(employee.id);
+      setPage(1);
+      setReloadKey((current) => current + 1);
+    } catch (error) {
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : "Employee could not be activated.",
+      );
+    }
+  }
+
   useEffect(() => {
     async function loadEmployees() {
       try {
@@ -75,6 +125,7 @@ export function EmployeeTable({
     sortBy,
     sortOrder,
     refreshKey,
+    reloadKey,
   ]);
 
   function resetPage() {
@@ -317,13 +368,33 @@ export function EmployeeTable({
                   </span>
                 </td>
                 <td className="px-5 py-4">
-                  <button
-                    type="button"
-                    onClick={() => onEditEmployee?.(employee)}
-                    className="text-sm font-medium text-slate-700 hover:text-slate-950"
-                  >
-                    Edit
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => onEditEmployee?.(employee)}
+                      className="text-sm font-medium text-slate-700 hover:text-slate-950"
+                    >
+                      Edit
+                    </button>
+
+                    {employee.status === "ACTIVE" ? (
+                      <button
+                        type="button"
+                        onClick={() => handleDeactivate(employee)}
+                        className="text-sm font-medium text-red-600 hover:text-red-700"
+                      >
+                        Deactivate
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleActivate(employee)}
+                        className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                      >
+                        Activate
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

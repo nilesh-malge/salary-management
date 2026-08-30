@@ -109,3 +109,43 @@ export async function updateEmployee(
 
   return response.json() as Promise<Employee>;
 }
+
+export async function deactivateEmployee(id: number): Promise<Employee> {
+  const response = await fetch(`${API_URL}/employees/${id}/deactivate`, {
+    method: "PATCH",
+  });
+
+  if (!response.ok) {
+    const error = (await response.json()) as {
+      message?: string | string[];
+    };
+
+    const message = Array.isArray(error.message)
+      ? error.message.join(", ")
+      : error.message;
+
+    throw new Error(message || "Unable to deactivate employee");
+  }
+
+  return response.json() as Promise<Employee>;
+}
+
+export async function activateEmployee(id: number): Promise<Employee> {
+  const response = await fetch(`${API_URL}/employees/${id}/activate`, {
+    method: "PATCH",
+  });
+
+  if (!response.ok) {
+    const error = (await response.json()) as {
+      message?: string | string[];
+    };
+
+    const message = Array.isArray(error.message)
+      ? error.message.join(", ")
+      : error.message;
+
+    throw new Error(message || "Unable to activate employee");
+  }
+
+  return response.json() as Promise<Employee>;
+}
