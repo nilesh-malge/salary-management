@@ -24,6 +24,16 @@ export type EmployeeListResponse = {
   totalPages: number;
 };
 
+export type EmployeeSortField =
+  | "employeeCode"
+  | "firstName"
+  | "department"
+  | "country"
+  | "salary"
+  | "createdAt";
+
+export type SortOrder = "asc" | "desc";
+
 export type EmployeeListParams = {
   page?: number;
   pageSize?: number;
@@ -31,4 +41,6 @@ export type EmployeeListParams = {
   department?: string;
   country?: string;
   status?: EmployeeStatus;
+  sortBy?: EmployeeSortField;
+  sortOrder?: SortOrder;
 };

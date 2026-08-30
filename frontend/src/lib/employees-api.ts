@@ -34,6 +34,14 @@ export async function getEmployees(
     searchParams.set("status", params.status);
   }
 
+  if (params.sortBy) {
+    searchParams.set("sortBy", params.sortBy);
+  }
+
+  if (params.sortOrder) {
+    searchParams.set("sortOrder", params.sortOrder);
+  }
+
   const query = searchParams.toString();
   const url = `${API_URL}/employees${query ? `?${query}` : ""}`;
 

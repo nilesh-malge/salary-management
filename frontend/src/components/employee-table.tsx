@@ -5,7 +5,9 @@ import { getEmployees } from "@/lib/employees-api";
 import type {
   Employee,
   EmployeeListResponse,
+  EmployeeSortField,
   EmployeeStatus,
+  SortOrder,
 } from "@/types/employees";
 
 function formatSalary(salary: string, currencyCode: string) {
@@ -23,6 +25,8 @@ export function EmployeeTable() {
   const [department, setDepartment] = useState("");
   const [country, setCountry] = useState("");
   const [status, setStatus] = useState<EmployeeStatus | "">("");
+  const [sortBy, setSortBy] = useState<EmployeeSortField>("employeeCode");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [pageInfo, setPageInfo] = useState<EmployeeListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -40,6 +44,8 @@ export function EmployeeTable() {
           department: department || undefined,
           country: country || undefined,
           status: status || undefined,
+          sortBy,
+          sortOrder,
         });
 
         setEmployees(response.data);
@@ -52,10 +58,21 @@ export function EmployeeTable() {
     }
 
     void loadEmployees();
-  }, [page, search, department, country, status]);
+  }, [page, search, department, country, status, sortBy, sortOrder]);
 
   function resetPage() {
     setPage(1);
+  }
+
+  function handleSort(field: EmployeeSortField) {
+    if (sortBy === field) {
+      setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+
+    resetPage();
   }
 
   if (loading && !pageInfo) {
@@ -175,11 +192,60 @@ export function EmployeeTable() {
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-slate-500">
             <tr>
-              <th className="px-5 py-3 font-medium">Employee</th>
-              <th className="px-5 py-3 font-medium">Department</th>
-              <th className="px-5 py-3 font-medium">Country</th>
+              <th className="px-5 py-3 font-medium">
+                <button
+                  type="button"
+                  onClick={() => handleSort("employeeCode")}
+                  className="inline-flex items-center gap-1"
+                >
+                  Employee
+                  {sortBy === "employeeCode" && (
+                    <span>{sortOrder === "asc" ? "↑" : "↓"}</span>
+                  )}
+                </button>
+              </th>
+
+              <th className="px-5 py-3 font-medium">
+                <button
+                  type="button"
+                  onClick={() => handleSort("department")}
+                  className="inline-flex items-center gap-1"
+                >
+                  Department
+                  {sortBy === "department" && (
+                    <span>{sortOrder === "asc" ? "↑" : "↓"}</span>
+                  )}
+                </button>
+              </th>
+
+              <th className="px-5 py-3 font-medium">
+                <button
+                  type="button"
+                  onClick={() => handleSort("country")}
+                  className="inline-flex items-center gap-1"
+                >
+                  Country
+                  {sortBy === "country" && (
+                    <span>{sortOrder === "asc" ? "↑" : "↓"}</span>
+                  )}
+                </button>
+              </th>
+
               <th className="px-5 py-3 font-medium">Job title</th>
-              <th className="px-5 py-3 text-right font-medium">Salary</th>
+
+              <th className="px-5 py-3 text-right font-medium">
+                <button
+                  type="button"
+                  onClick={() => handleSort("salary")}
+                  className="ml-auto inline-flex items-center gap-1"
+                >
+                  Salary
+                  {sortBy === "salary" && (
+                    <span>{sortOrder === "asc" ? "↑" : "↓"}</span>
+                  )}
+                </button>
+              </th>
+
               <th className="px-5 py-3 font-medium">Status</th>
             </tr>
           </thead>
