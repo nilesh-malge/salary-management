@@ -40,7 +40,7 @@ describe('ReportsController', () => {
 
       reportsService.getPayrollSummary.mockResolvedValue(summary);
 
-      const result = await controller.getPayrollSummary();
+      const result = await controller.getPayrollSummary({});
 
       expect(result).toEqual(summary);
       expect(reportsService.getPayrollSummary).toHaveBeenCalledTimes(1);
@@ -60,7 +60,7 @@ describe('ReportsController', () => {
 
     reportsService.getDepartmentBreakdown.mockResolvedValue(breakdown);
 
-    await expect(controller.getDepartmentBreakdown()).resolves.toEqual(
+    await expect(controller.getDepartmentBreakdown({})).resolves.toEqual(
       breakdown,
     );
 
@@ -129,7 +129,7 @@ describe('ReportsController', () => {
 
       reportsService.getCountryBreakdown.mockResolvedValue(breakdown);
 
-      await expect(controller.getCountryBreakdown()).resolves.toEqual(
+      await expect(controller.getCountryBreakdown({})).resolves.toEqual(
         breakdown,
       );
 
@@ -185,7 +185,7 @@ describe('ReportsController', () => {
 
       reportsService.getSalaryDistribution.mockResolvedValue(distribution);
 
-      await expect(controller.getSalaryDistribution()).resolves.toEqual(
+      await expect(controller.getSalaryDistribution({})).resolves.toEqual(
         distribution,
       );
 
