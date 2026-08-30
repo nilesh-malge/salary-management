@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { getEmployees } from "@/lib/employees-api";
-import type { Employee, EmployeeListResponse } from "@/types/employees";
+import type {
+  Employee,
+  EmployeeListResponse,
+  EmployeeStatus,
+} from "@/types/employees";
 
 function formatSalary(salary: string, currencyCode: string) {
   return new Intl.NumberFormat("en-IN", {
@@ -15,6 +19,10 @@ function formatSalary(salary: string, currencyCode: string) {
 export function EmployeeTable() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [department, setDepartment] = useState("");
+  const [country, setCountry] = useState("");
+  const [status, setStatus] = useState<EmployeeStatus | "">("");
   const [pageInfo, setPageInfo] = useState<EmployeeListResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,6 +36,10 @@ export function EmployeeTable() {
         const response = await getEmployees({
           page,
           pageSize: 10,
+          search: search || undefined,
+          department: department || undefined,
+          country: country || undefined,
+          status: status || undefined,
         });
 
         setEmployees(response.data);
@@ -40,7 +52,11 @@ export function EmployeeTable() {
     }
 
     void loadEmployees();
-  }, [page]);
+  }, [page, search, department, country, status]);
+
+  function resetPage() {
+    setPage(1);
+  }
 
   if (loading && !pageInfo) {
     return (
@@ -60,6 +76,86 @@ export function EmployeeTable() {
 
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="grid gap-4 border-b border-slate-200 p-5 md:grid-cols-4">
+        <label>
+          <span className="mb-2 block text-sm font-medium text-slate-700">
+            Search
+          </span>
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              resetPage();
+            }}
+            placeholder="Name, email or employee code"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900"
+          />
+        </label>
+
+        <label>
+          <span className="mb-2 block text-sm font-medium text-slate-700">
+            Department
+          </span>
+          <select
+            value={department}
+            onChange={(event) => {
+              setDepartment(event.target.value);
+              resetPage();
+            }}
+            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+          >
+            <option value="">All departments</option>
+            <option value="Customer Support">Customer Support</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Finance">Finance</option>
+            <option value="HR">HR</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Operations">Operations</option>
+            <option value="Product">Product</option>
+            <option value="Sales">Sales</option>
+          </select>
+        </label>
+
+        <label>
+          <span className="mb-2 block text-sm font-medium text-slate-700">
+            Country
+          </span>
+          <select
+            value={country}
+            onChange={(event) => {
+              setCountry(event.target.value);
+              resetPage();
+            }}
+            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+          >
+            <option value="">All countries</option>
+            <option value="Germany">Germany</option>
+            <option value="India">India</option>
+            <option value="United Arab Emirates">United Arab Emirates</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="United States">United States</option>
+          </select>
+        </label>
+
+        <label>
+          <span className="mb-2 block text-sm font-medium text-slate-700">
+            Status
+          </span>
+          <select
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value as EmployeeStatus | "");
+              resetPage();
+            }}
+            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+          >
+            <option value="">All statuses</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+        </label>
+      </div>
       <div className="border-b border-slate-200 px-5 py-4">
         <div className="flex items-center justify-between gap-4">
           <div>
@@ -89,6 +185,16 @@ export function EmployeeTable() {
           </thead>
 
           <tbody className="divide-y divide-slate-100">
+            {employees.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-5 py-8 text-center text-sm text-slate-500"
+                >
+                  No employees found.
+                </td>
+              </tr>
+            )}
             {employees.map((employee) => (
               <tr key={employee.id}>
                 <td className="px-5 py-3">

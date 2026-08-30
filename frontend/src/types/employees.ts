@@ -27,4 +27,8 @@ export type EmployeeListResponse = {
 export type EmployeeListParams = {
   page?: number;
   pageSize?: number;
+  search?: string;
+  department?: string;
+  country?: string;
+  status?: EmployeeStatus;
 };

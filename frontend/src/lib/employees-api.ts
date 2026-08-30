@@ -18,6 +18,22 @@ export async function getEmployees(
     searchParams.set("pageSize", params.pageSize.toString());
   }
 
+  if (params.search) {
+    searchParams.set("search", params.search);
+  }
+
+  if (params.department) {
+    searchParams.set("department", params.department);
+  }
+
+  if (params.country) {
+    searchParams.set("country", params.country);
+  }
+
+  if (params.status) {
+    searchParams.set("status", params.status);
+  }
+
   const query = searchParams.toString();
   const url = `${API_URL}/employees${query ? `?${query}` : ""}`;
 
