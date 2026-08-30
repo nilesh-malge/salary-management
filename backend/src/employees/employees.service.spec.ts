@@ -13,6 +13,9 @@ describe('EmployeesService', () => {
       count: jest.fn(),
       update: jest.fn(),
     },
+    exchangeRate: {
+      findUnique: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -53,13 +56,53 @@ describe('EmployeesService', () => {
         updatedAt: new Date(),
       });
 
+      prismaMock.exchangeRate.findUnique.mockResolvedValue({
+        id: 1,
+        currencyCode: 'INR',
+        rateToBase: 1,
+      });
+
       const result = await service.create(employeeData);
+
+      expect(prismaMock.exchangeRate.findUnique).toHaveBeenCalledWith({
+        where: {
+          currencyCode: 'INR',
+        },
+      });
 
       expect(prismaMock.employee.create).toHaveBeenCalledWith({
         data: employeeData,
       });
 
       expect(result.employeeCode).toBe('EMP001');
+    });
+
+    it('should reject an unsupported currency', async () => {
+      const employeeData = {
+        employeeCode: 'EMP002',
+        firstName: 'Priya',
+        lastName: 'Patel',
+        email: 'priya.patel@example.com',
+        department: 'Product',
+        country: 'India',
+        jobTitle: 'Product Analyst',
+        salary: 800000,
+        currencyCode: 'XYZ',
+      };
+
+      prismaMock.exchangeRate.findUnique.mockResolvedValue(null);
+
+      await expect(service.create(employeeData)).rejects.toThrow(
+        'Unsupported currency code: XYZ',
+      );
+
+      expect(prismaMock.exchangeRate.findUnique).toHaveBeenCalledWith({
+        where: {
+          currencyCode: 'XYZ',
+        },
+      });
+
+      expect(prismaMock.employee.create).not.toHaveBeenCalled();
     });
   });
 
@@ -240,6 +283,8 @@ describe('EmployeesService', () => {
 
       const result = await service.update(1, updateData);
 
+      expect(prismaMock.exchangeRate.findUnique).not.toHaveBeenCalled();
+
       expect(prismaMock.employee.update).toHaveBeenCalledWith({
         where: {
           id: 1,
@@ -249,6 +294,26 @@ describe('EmployeesService', () => {
 
       expect(result.jobTitle).toBe('Senior Software Engineer');
       expect(result.salary).toBe(1100000);
+    });
+
+    it('should reject an unsupported currency when updating an employee', async () => {
+      const updateData = {
+        currencyCode: 'XYZ',
+      };
+
+      prismaMock.exchangeRate.findUnique.mockResolvedValue(null);
+
+      await expect(service.update(1, updateData)).rejects.toThrow(
+        'Unsupported currency code: XYZ',
+      );
+
+      expect(prismaMock.exchangeRate.findUnique).toHaveBeenCalledWith({
+        where: {
+          currencyCode: 'XYZ',
+        },
+      });
+
+      expect(prismaMock.employee.update).not.toHaveBeenCalled();
     });
   });
 

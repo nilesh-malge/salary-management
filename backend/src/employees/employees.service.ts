@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -13,13 +13,33 @@ import { EmployeeSortField, SortOrder } from './dto/list-employees-query.dto';
 export class EmployeesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateEmployeeDto): Promise<Employee> {
+  private async validateCurrency(currencyCode: string) {
+    const exchangeRate = await this.prisma.exchangeRate.findUnique({
+      where: {
+        currencyCode,
+      },
+    });
+
+    if (!exchangeRate) {
+      throw new BadRequestException(
+        `Unsupported currency code: ${currencyCode}`,
+      );
+    }
+  }
+
+  async create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
+    await this.validateCurrency(createEmployeeDto.currencyCode);
+
     return this.prisma.employee.create({
-      data,
+      data: createEmployeeDto,
     });
   }
 
   async update(id: number, data: UpdateEmployeeDto): Promise<Employee> {
+    if (data.currencyCode) {
+      await this.validateCurrency(data.currencyCode);
+    }
+
     return this.prisma.employee.update({
       where: {
         id,
