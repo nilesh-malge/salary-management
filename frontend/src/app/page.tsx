@@ -1,4 +1,5 @@
 import { PayrollSummaryCards } from "@/components/payroll-summary";
+import { PayrollBreakdown } from "@/components/payroll-breakdown";
 
 export default function Home() {
   return (
@@ -25,6 +26,9 @@ export default function Home() {
         </div>
 
         <PayrollSummaryCards />
+        <div className="mt-8">
+          <PayrollBreakdown />
+        </div>
       </section>
     </main>
   );

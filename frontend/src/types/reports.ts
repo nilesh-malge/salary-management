@@ -5,3 +5,19 @@ export type PayrollSummary = {
   employeeCount: number;
   currencyCode: string;
 };
+
+export type DepartmentPayroll = {
+  department: string;
+  totalPayroll: number;
+  averageSalary: number;
+  employeeCount: number;
+  currencyCode: string;
+};
+
+export type CountryPayroll = {
+  country: string;
+  totalPayroll: number;
+  averageSalary: number;
+  employeeCount: number;
+  currencyCode: string;
+};
