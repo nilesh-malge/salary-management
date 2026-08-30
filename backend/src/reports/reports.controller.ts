@@ -9,4 +9,9 @@ export class ReportsController {
   async getPayrollSummary() {
     return this.reportsService.getPayrollSummary();
   }
+
+  @Get('payroll-by-department')
+  async getDepartmentBreakdown() {
+    return this.reportsService.getDepartmentBreakdown();
+  }
 }

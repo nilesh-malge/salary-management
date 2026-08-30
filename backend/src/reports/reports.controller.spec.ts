@@ -7,6 +7,7 @@ describe('ReportsController', () => {
 
   const reportsService = {
     getPayrollSummary: jest.fn(),
+    getDepartmentBreakdown: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -42,5 +43,25 @@ describe('ReportsController', () => {
       expect(result).toEqual(summary);
       expect(reportsService.getPayrollSummary).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('returns payroll breakdown by department', async () => {
+    const breakdown = [
+      {
+        department: 'Engineering',
+        totalPayroll: 15000000,
+        averageSalary: 1500000,
+        employeeCount: 10,
+        currencyCode: 'INR',
+      },
+    ];
+
+    reportsService.getDepartmentBreakdown.mockResolvedValue(breakdown);
+
+    await expect(controller.getDepartmentBreakdown()).resolves.toEqual(
+      breakdown,
+    );
+
+    expect(reportsService.getDepartmentBreakdown).toHaveBeenCalledTimes(1);
   });
 });

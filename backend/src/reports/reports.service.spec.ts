@@ -70,4 +70,42 @@ describe('ReportsService', () => {
       });
     });
   });
+
+  describe('getDepartmentBreakdown', () => {
+    it('returns payroll breakdown by department in INR', async () => {
+      const breakdown = [
+        {
+          department: 'Engineering',
+          totalPayroll: 15000000,
+          averageSalary: 1500000,
+          employeeCount: 10,
+        },
+        {
+          department: 'Product',
+          totalPayroll: 8000000,
+          averageSalary: 1000000,
+          employeeCount: 8,
+        },
+      ];
+
+      prisma.$queryRaw.mockResolvedValue(breakdown);
+
+      await expect(service.getDepartmentBreakdown()).resolves.toEqual([
+        {
+          department: 'Engineering',
+          totalPayroll: 15000000,
+          averageSalary: 1500000,
+          employeeCount: 10,
+          currencyCode: 'INR',
+        },
+        {
+          department: 'Product',
+          totalPayroll: 8000000,
+          averageSalary: 1000000,
+          employeeCount: 8,
+          currencyCode: 'INR',
+        },
+      ]);
+    });
+  });
 });
