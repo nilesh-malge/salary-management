@@ -2,6 +2,7 @@ import type {
   CountryPayroll,
   DepartmentPayroll,
   PayrollSummary,
+  SalaryDistribution,
 } from "@/types/reports";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -34,4 +35,14 @@ export async function getCountryPayroll(): Promise<CountryPayroll[]> {
   }
 
   return response.json() as Promise<CountryPayroll[]>;
+}
+
+export async function getSalaryDistribution(): Promise<SalaryDistribution[]> {
+  const response = await fetch(`${API_URL}/reports/salary-distribution`);
+
+  if (!response.ok) {
+    throw new Error("Unable to load salary distribution");
+  }
+
+  return response.json() as Promise<SalaryDistribution[]>;
 }

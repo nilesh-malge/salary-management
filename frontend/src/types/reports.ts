@@ -21,3 +21,8 @@ export type CountryPayroll = {
   employeeCount: number;
   currencyCode: string;
 };
+
+export type SalaryDistribution = {
+  salaryRange: string;
+  employeeCount: number;
+};

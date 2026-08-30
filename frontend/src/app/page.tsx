@@ -1,5 +1,6 @@
 import { PayrollSummaryCards } from "@/components/payroll-summary";
 import { PayrollBreakdown } from "@/components/payroll-breakdown";
+import { SalaryDistributionChart } from "@/components/salary-distribution";
 
 export default function Home() {
   return (
@@ -26,8 +27,13 @@ export default function Home() {
         </div>
 
         <PayrollSummaryCards />
+
         <div className="mt-8">
           <PayrollBreakdown />
+        </div>
+
+        <div className="mt-8">
+          <SalaryDistributionChart />
         </div>
       </section>
     </main>
