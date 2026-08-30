@@ -1,17 +1,36 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import {
   EmployeeStatus,
+  Prisma,
   type Employee,
-  type Prisma,
 } from '../../generated/prisma/client';
 import { EmployeeSortField, SortOrder } from './dto/list-employees-query.dto';
 
 @Injectable()
 export class EmployeesService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private handleEmployeeWriteError(error: unknown): never {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2025') {
+        throw new NotFoundException('Employee not found');
+      }
+
+      if (error.code === 'P2002') {
+        throw new ConflictException('Employee code or email already exists');
+      }
+    }
+
+    throw error;
+  }
 
   private async validateCurrency(currencyCode: string) {
     const exchangeRate = await this.prisma.exchangeRate.findUnique({
@@ -30,9 +49,13 @@ export class EmployeesService {
   async create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
     await this.validateCurrency(createEmployeeDto.currencyCode);
 
-    return this.prisma.employee.create({
-      data: createEmployeeDto,
-    });
+    try {
+      return await this.prisma.employee.create({
+        data: createEmployeeDto,
+      });
+    } catch (error) {
+      this.handleEmployeeWriteError(error);
+    }
   }
 
   async update(id: number, data: UpdateEmployeeDto): Promise<Employee> {
@@ -40,23 +63,31 @@ export class EmployeesService {
       await this.validateCurrency(data.currencyCode);
     }
 
-    return this.prisma.employee.update({
-      where: {
-        id,
-      },
-      data,
-    });
+    try {
+      return await this.prisma.employee.update({
+        where: {
+          id,
+        },
+        data,
+      });
+    } catch (error) {
+      this.handleEmployeeWriteError(error);
+    }
   }
 
   async deactivate(id: number): Promise<Employee> {
-    return this.prisma.employee.update({
-      where: {
-        id,
-      },
-      data: {
-        status: EmployeeStatus.INACTIVE,
-      },
-    });
+    try {
+      return await this.prisma.employee.update({
+        where: {
+          id,
+        },
+        data: {
+          status: EmployeeStatus.INACTIVE,
+        },
+      });
+    } catch (error) {
+      this.handleEmployeeWriteError(error);
+    }
   }
 
   async findAll({

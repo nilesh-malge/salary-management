@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmployeesService } from './employees.service';
 import { EmployeeSortField, SortOrder } from './dto/list-employees-query.dto';
@@ -103,6 +104,37 @@ describe('EmployeesService', () => {
       });
 
       expect(prismaMock.employee.create).not.toHaveBeenCalled();
+    });
+
+    it('should return conflict when employee code or email already exists', async () => {
+      const employeeData = {
+        employeeCode: 'EMP001',
+        firstName: 'Amit',
+        lastName: 'Sharma',
+        email: 'amit.sharma@example.com',
+        department: 'Engineering',
+        country: 'India',
+        jobTitle: 'Software Engineer',
+        salary: 900000,
+        currencyCode: 'INR',
+      };
+
+      prismaMock.exchangeRate.findUnique.mockResolvedValue({
+        id: 1,
+        currencyCode: 'INR',
+        rateToBase: 1,
+      });
+
+      prismaMock.employee.create.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError('Unique constraint failed.', {
+          code: 'P2002',
+          clientVersion: '7.10.0',
+        }),
+      );
+
+      await expect(service.create(employeeData)).rejects.toThrow(
+        'Employee code or email already exists',
+      );
     });
   });
 
@@ -315,6 +347,41 @@ describe('EmployeesService', () => {
 
       expect(prismaMock.employee.update).not.toHaveBeenCalled();
     });
+
+    it('should return not found when updating an employee that does not exist', async () => {
+      prismaMock.employee.update.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError(
+          'Record to update not found.',
+          {
+            code: 'P2025',
+            clientVersion: '7.10.0',
+          },
+        ),
+      );
+
+      await expect(
+        service.update(99999, {
+          jobTitle: 'Senior Software Engineer',
+        }),
+      ).rejects.toThrow('Employee not found');
+    });
+
+    it('should return conflict when updating to an existing employee code or email', async () => {
+      const updateData = {
+        email: 'existing.employee@example.com',
+      };
+
+      prismaMock.employee.update.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError('Unique constraint failed.', {
+          code: 'P2002',
+          clientVersion: '7.10.0',
+        }),
+      );
+
+      await expect(service.update(1, updateData)).rejects.toThrow(
+        'Employee code or email already exists',
+      );
+    });
   });
 
   describe('deactivate', () => {
@@ -347,6 +414,22 @@ describe('EmployeesService', () => {
       });
 
       expect(result.status).toBe('INACTIVE');
+    });
+
+    it('should return not found when deactivating an employee that does not exist', async () => {
+      prismaMock.employee.update.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError(
+          'Record to update not found.',
+          {
+            code: 'P2025',
+            clientVersion: '7.10.0',
+          },
+        ),
+      );
+
+      await expect(service.deactivate(99999)).rejects.toThrow(
+        'Employee not found',
+      );
     });
   });
 });
