@@ -1,3 +1,5 @@
+import { PayrollSummaryCards } from "@/components/payroll-summary";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50">
@@ -18,18 +20,11 @@ export default function Home() {
         <div className="mb-8">
           <h2 className="text-2xl font-semibold text-slate-900">Dashboard</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Overview of employee salary and payroll information.
+            Overview of active employee salary and payroll information.
           </p>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
-          <h3 className="text-base font-medium text-slate-900">
-            Payroll overview
-          </h3>
-          <p className="mt-2 text-sm text-slate-500">
-            Payroll metrics and employee analytics will appear here.
-          </p>
-        </div>
+        <PayrollSummaryCards />
       </section>
     </main>
   );
