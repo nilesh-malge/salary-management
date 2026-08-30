@@ -66,4 +66,32 @@ export class ReportsService {
       currencyCode: 'INR',
     }));
   }
+
+  async getCountryBreakdown() {
+    const result = await this.prisma.$queryRaw<
+      {
+        country: string;
+        totalPayroll: number;
+        averageSalary: number;
+        employeeCount: number;
+      }[]
+    >(Prisma.sql`
+    SELECT
+      e.country,
+      COALESCE(SUM(e.salary * r."rateToBase"), 0)::float AS "totalPayroll",
+      COALESCE(AVG(e.salary * r."rateToBase"), 0)::float AS "averageSalary",
+      COUNT(*)::int AS "employeeCount"
+    FROM "Employee" e
+    JOIN "ExchangeRate" r
+      ON r."currencyCode" = e."currencyCode"
+    WHERE e.status = 'ACTIVE'
+    GROUP BY e.country
+    ORDER BY e.country
+  `);
+
+    return result.map((country) => ({
+      ...country,
+      currencyCode: 'INR',
+    }));
+  }
 }

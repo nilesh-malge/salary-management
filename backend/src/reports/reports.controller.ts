@@ -14,4 +14,9 @@ export class ReportsController {
   async getDepartmentBreakdown() {
     return this.reportsService.getDepartmentBreakdown();
   }
+
+  @Get('payroll-by-country')
+  async getCountryBreakdown() {
+    return this.reportsService.getCountryBreakdown();
+  }
 }

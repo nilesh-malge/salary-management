@@ -108,4 +108,42 @@ describe('ReportsService', () => {
       ]);
     });
   });
+
+  describe('getCountryBreakdown', () => {
+    it('returns payroll breakdown by country in INR', async () => {
+      const breakdown = [
+        {
+          country: 'India',
+          totalPayroll: 12000000,
+          averageSalary: 800000,
+          employeeCount: 15,
+        },
+        {
+          country: 'United States',
+          totalPayroll: 18000000,
+          averageSalary: 1200000,
+          employeeCount: 15,
+        },
+      ];
+
+      prisma.$queryRaw.mockResolvedValue(breakdown);
+
+      await expect(service.getCountryBreakdown()).resolves.toEqual([
+        {
+          country: 'India',
+          totalPayroll: 12000000,
+          averageSalary: 800000,
+          employeeCount: 15,
+          currencyCode: 'INR',
+        },
+        {
+          country: 'United States',
+          totalPayroll: 18000000,
+          averageSalary: 1200000,
+          employeeCount: 15,
+          currencyCode: 'INR',
+        },
+      ]);
+    });
+  });
 });

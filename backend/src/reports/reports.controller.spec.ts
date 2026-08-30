@@ -8,6 +8,7 @@ describe('ReportsController', () => {
   const reportsService = {
     getPayrollSummary: jest.fn(),
     getDepartmentBreakdown: jest.fn(),
+    getCountryBreakdown: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -63,5 +64,27 @@ describe('ReportsController', () => {
     );
 
     expect(reportsService.getDepartmentBreakdown).toHaveBeenCalledTimes(1);
+  });
+
+  describe('getCountryBreakdown', () => {
+    it('returns payroll breakdown by country', async () => {
+      const breakdown = [
+        {
+          country: 'India',
+          totalPayroll: 12000000,
+          averageSalary: 800000,
+          employeeCount: 15,
+          currencyCode: 'INR',
+        },
+      ];
+
+      reportsService.getCountryBreakdown.mockResolvedValue(breakdown);
+
+      await expect(controller.getCountryBreakdown()).resolves.toEqual(
+        breakdown,
+      );
+
+      expect(reportsService.getCountryBreakdown).toHaveBeenCalledTimes(1);
+    });
   });
 });
