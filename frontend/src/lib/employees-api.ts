@@ -3,6 +3,7 @@ import type {
   Employee,
   EmployeeListParams,
   EmployeeListResponse,
+  UpdateEmployeeInput,
 } from "@/types/employees";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -77,6 +78,33 @@ export async function createEmployee(
       : error.message;
 
     throw new Error(message || "Unable to create employee");
+  }
+
+  return response.json() as Promise<Employee>;
+}
+
+export async function updateEmployee(
+  id: number,
+  input: UpdateEmployeeInput,
+): Promise<Employee> {
+  const response = await fetch(`${API_URL}/employees/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    const error = (await response.json()) as {
+      message?: string | string[];
+    };
+
+    const message = Array.isArray(error.message)
+      ? error.message.join(", ")
+      : error.message;
+
+    throw new Error(message || "Unable to update employee");
   }
 
   return response.json() as Promise<Employee>;

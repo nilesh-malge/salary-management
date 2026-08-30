@@ -12,6 +12,7 @@ import type {
 
 type EmployeeTableProps = {
   refreshKey?: number;
+  onEditEmployee?: (employee: Employee) => void;
 };
 
 function formatSalary(salary: string, currencyCode: string) {
@@ -22,7 +23,10 @@ function formatSalary(salary: string, currencyCode: string) {
   }).format(Number(salary));
 }
 
-export function EmployeeTable({ refreshKey = 0 }: EmployeeTableProps) {
+export function EmployeeTable({
+  refreshKey = 0,
+  onEditEmployee,
+}: EmployeeTableProps) {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -260,6 +264,8 @@ export function EmployeeTable({ refreshKey = 0 }: EmployeeTableProps) {
               </th>
 
               <th className="px-5 py-3 font-medium">Status</th>
+
+              <th className="px-5 py-3 font-medium">Actions</th>
             </tr>
           </thead>
 
@@ -267,7 +273,7 @@ export function EmployeeTable({ refreshKey = 0 }: EmployeeTableProps) {
             {employees.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-5 py-8 text-center text-sm text-slate-500"
                 >
                   No employees found.
@@ -309,6 +315,15 @@ export function EmployeeTable({ refreshKey = 0 }: EmployeeTableProps) {
                   >
                     {employee.status}
                   </span>
+                </td>
+                <td className="px-5 py-4">
+                  <button
+                    type="button"
+                    onClick={() => onEditEmployee?.(employee)}
+                    className="text-sm font-medium text-slate-700 hover:text-slate-950"
+                  >
+                    Edit
+                  </button>
                 </td>
               </tr>
             ))}

@@ -56,3 +56,5 @@ export type CreateEmployeeInput = {
   salary: number;
   currencyCode: string;
 };
+
+export type UpdateEmployeeInput = Partial<CreateEmployeeInput>;

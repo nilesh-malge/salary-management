@@ -1,30 +1,34 @@
 "use client";
 
 import { useState, type SubmitEvent } from "react";
-import { createEmployee } from "@/lib/employees-api";
-import type { CreateEmployeeInput } from "@/types/employees";
+import { updateEmployee } from "@/lib/employees-api";
+import type { Employee, UpdateEmployeeInput } from "@/types/employees";
 
-type AddEmployeeFormProps = {
-  onEmployeeCreated: () => void;
+type EditEmployeeFormProps = {
+  employee: Employee;
+  onUpdated: () => void;
+  onCancel: () => void;
 };
 
-const initialForm = {
-  employeeCode: "",
-  firstName: "",
-  lastName: "",
-  email: "",
-  department: "",
-  country: "",
-  jobTitle: "",
-  salary: "",
-  currencyCode: "",
-};
+export function EditEmployeeForm({
+  employee,
+  onUpdated,
+  onCancel,
+}: EditEmployeeFormProps) {
+  const [form, setForm] = useState({
+    employeeCode: employee.employeeCode,
+    firstName: employee.firstName,
+    lastName: employee.lastName,
+    email: employee.email,
+    department: employee.department,
+    country: employee.country,
+    jobTitle: employee.jobTitle,
+    salary: employee.salary,
+    currencyCode: employee.currencyCode,
+  });
 
-export function AddEmployeeForm({ onEmployeeCreated }: AddEmployeeFormProps) {
-  const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   function updateField(name: keyof typeof form, value: string) {
     setForm((current) => ({
@@ -45,7 +49,7 @@ export function AddEmployeeForm({ onEmployeeCreated }: AddEmployeeFormProps) {
     setForm((current) => ({
       ...current,
       country,
-      currencyCode: currencies[country] ?? "",
+      currencyCode: currencies[country] ?? current.currencyCode,
     }));
   }
 
@@ -55,9 +59,8 @@ export function AddEmployeeForm({ onEmployeeCreated }: AddEmployeeFormProps) {
     try {
       setSubmitting(true);
       setError("");
-      setSuccess("");
 
-      const input: CreateEmployeeInput = {
+      const input: UpdateEmployeeInput = {
         employeeCode: form.employeeCode.trim(),
         firstName: form.firstName.trim(),
         lastName: form.lastName.trim(),
@@ -69,14 +72,13 @@ export function AddEmployeeForm({ onEmployeeCreated }: AddEmployeeFormProps) {
         currencyCode: form.currencyCode,
       };
 
-      await createEmployee(input);
-
-      setForm(initialForm);
-      setSuccess("Employee added successfully.");
-      onEmployeeCreated();
+      await updateEmployee(employee.id, input);
+      onUpdated();
     } catch (error) {
       setError(
-        error instanceof Error ? error.message : "Employee could not be added.",
+        error instanceof Error
+          ? error.message
+          : "Employee could not be updated.",
       );
     } finally {
       setSubmitting(false);
@@ -88,11 +90,21 @@ export function AddEmployeeForm({ onEmployeeCreated }: AddEmployeeFormProps) {
       onSubmit={handleSubmit}
       className="rounded-lg border border-slate-200 bg-white p-5"
     >
-      <div className="mb-5">
-        <h3 className="font-medium text-slate-900">Add employee</h3>
-        <p className="mt-1 text-sm text-slate-500">
-          Add an employee and their current salary information.
-        </p>
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <h3 className="font-medium text-slate-900">Edit employee</h3>
+          <p className="mt-1 text-sm text-slate-500">
+            Update employee details and current salary.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-sm text-slate-500 hover:text-slate-900"
+        >
+          Cancel
+        </button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -157,7 +169,6 @@ export function AddEmployeeForm({ onEmployeeCreated }: AddEmployeeFormProps) {
             onChange={(event) => updateField("department", event.target.value)}
             className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
           >
-            <option value="">Select department</option>
             <option value="Customer Support">Customer Support</option>
             <option value="Engineering">Engineering</option>
             <option value="Finance">Finance</option>
@@ -179,7 +190,6 @@ export function AddEmployeeForm({ onEmployeeCreated }: AddEmployeeFormProps) {
             onChange={(event) => handleCountryChange(event.target.value)}
             className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
           >
-            <option value="">Select country</option>
             <option value="Germany">Germany</option>
             <option value="India">India</option>
             <option value="United Arab Emirates">United Arab Emirates</option>
@@ -229,15 +239,22 @@ export function AddEmployeeForm({ onEmployeeCreated }: AddEmployeeFormProps) {
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
-      {success && <p className="mt-4 text-sm text-slate-600">{success}</p>}
-
-      <div className="mt-5">
+      <div className="mt-5 flex gap-3">
         <button
           type="submit"
           disabled={submitting}
           className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {submitting ? "Adding..." : "Add employee"}
+          {submitting ? "Saving..." : "Save changes"}
+        </button>
+
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={submitting}
+          className="rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-700 disabled:opacity-50"
+        >
+          Cancel
         </button>
       </div>
     </form>
