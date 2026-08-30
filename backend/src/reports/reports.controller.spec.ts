@@ -67,6 +67,54 @@ describe('ReportsController', () => {
     expect(reportsService.getDepartmentBreakdown).toHaveBeenCalledTimes(1);
   });
 
+  it('passes report filters to the department breakdown service', async () => {
+    const filters = {
+      department: 'Engineering',
+      country: 'India',
+    };
+
+    const breakdown = [
+      {
+        department: 'Engineering',
+        totalPayroll: 400450000,
+        averageSalary: 1779777.7777777778,
+        employeeCount: 225,
+        currencyCode: 'INR',
+      },
+    ];
+
+    reportsService.getDepartmentBreakdown.mockResolvedValue(breakdown);
+
+    await expect(controller.getDepartmentBreakdown(filters)).resolves.toEqual(
+      breakdown,
+    );
+
+    expect(reportsService.getDepartmentBreakdown).toHaveBeenCalledWith(filters);
+  });
+
+  it('passes report filters to the payroll summary service', async () => {
+    const filters = {
+      department: 'Engineering',
+      country: 'India',
+    };
+
+    const summary = {
+      totalPayroll: 9000000,
+      averageSalary: 900000,
+      medianSalary: 850000,
+      employeeCount: 10,
+      currencyCode: 'INR',
+    };
+
+    reportsService.getPayrollSummary.mockResolvedValue(summary);
+
+    await expect(controller.getPayrollSummary(filters)).resolves.toEqual(
+      summary,
+    );
+
+    expect(reportsService.getPayrollSummary).toHaveBeenCalledWith(filters);
+  });
+
   describe('getCountryBreakdown', () => {
     it('returns payroll breakdown by country', async () => {
       const breakdown = [
@@ -86,6 +134,31 @@ describe('ReportsController', () => {
       );
 
       expect(reportsService.getCountryBreakdown).toHaveBeenCalledTimes(1);
+    });
+
+    it('passes report filters to the country breakdown service', async () => {
+      const filters = {
+        department: 'Engineering',
+        country: 'India',
+      };
+
+      const breakdown = [
+        {
+          country: 'India',
+          totalPayroll: 400450000,
+          averageSalary: 1779777.7777777778,
+          employeeCount: 225,
+          currencyCode: 'INR',
+        },
+      ];
+
+      reportsService.getCountryBreakdown.mockResolvedValue(breakdown);
+
+      await expect(controller.getCountryBreakdown(filters)).resolves.toEqual(
+        breakdown,
+      );
+
+      expect(reportsService.getCountryBreakdown).toHaveBeenCalledWith(filters);
     });
   });
 
@@ -117,6 +190,30 @@ describe('ReportsController', () => {
       );
 
       expect(reportsService.getSalaryDistribution).toHaveBeenCalledTimes(1);
+    });
+
+    it('passes report filters to the salary distribution service', async () => {
+      const filters = {
+        department: 'Engineering',
+        country: 'India',
+      };
+
+      const distribution = [
+        {
+          salaryRange: '0-2M',
+          employeeCount: 225,
+        },
+      ];
+
+      reportsService.getSalaryDistribution.mockResolvedValue(distribution);
+
+      await expect(controller.getSalaryDistribution(filters)).resolves.toEqual(
+        distribution,
+      );
+
+      expect(reportsService.getSalaryDistribution).toHaveBeenCalledWith(
+        filters,
+      );
     });
   });
 });

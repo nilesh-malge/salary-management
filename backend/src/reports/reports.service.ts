@@ -1,12 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ReportFilterQueryDto } from './dto/report-filter-query.dto';
 
 @Injectable()
 export class ReportsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getPayrollSummary() {
+  private buildReportWhereClause(filters: ReportFilterQueryDto) {
+    const conditions: Prisma.Sql[] = [Prisma.sql`e.status = 'ACTIVE'`];
+
+    if (filters.department) {
+      conditions.push(Prisma.sql`e.department = ${filters.department}`);
+    }
+
+    if (filters.country) {
+      conditions.push(Prisma.sql`e.country = ${filters.country}`);
+    }
+
+    return Prisma.join(conditions, ' AND ');
+  }
+
+  async getPayrollSummary(filters: ReportFilterQueryDto = {}) {
+    const whereClause = this.buildReportWhereClause(filters);
     const result = await this.prisma.$queryRaw<
       {
         totalPayroll: number;
@@ -28,7 +44,7 @@ export class ReportsService {
       FROM "Employee" e
       JOIN "ExchangeRate" r
         ON r."currencyCode" = e."currencyCode"
-      WHERE e.status = 'ACTIVE'
+      WHERE ${whereClause}
     `);
 
     const summary = result[0];
@@ -39,7 +55,8 @@ export class ReportsService {
     };
   }
 
-  async getDepartmentBreakdown() {
+  async getDepartmentBreakdown(filters: ReportFilterQueryDto = {}) {
+    const whereClause = this.buildReportWhereClause(filters);
     const result = await this.prisma.$queryRaw<
       {
         department: string;
@@ -56,7 +73,7 @@ export class ReportsService {
     FROM "Employee" e
     JOIN "ExchangeRate" r
       ON r."currencyCode" = e."currencyCode"
-    WHERE e.status = 'ACTIVE'
+    WHERE ${whereClause}
     GROUP BY e.department
     ORDER BY e.department
   `);
@@ -67,7 +84,8 @@ export class ReportsService {
     }));
   }
 
-  async getCountryBreakdown() {
+  async getCountryBreakdown(filters: ReportFilterQueryDto = {}) {
+    const whereClause = this.buildReportWhereClause(filters);
     const result = await this.prisma.$queryRaw<
       {
         country: string;
@@ -84,7 +102,7 @@ export class ReportsService {
     FROM "Employee" e
     JOIN "ExchangeRate" r
       ON r."currencyCode" = e."currencyCode"
-    WHERE e.status = 'ACTIVE'
+    WHERE ${whereClause}
     GROUP BY e.country
     ORDER BY e.country
   `);
@@ -95,7 +113,8 @@ export class ReportsService {
     }));
   }
 
-  async getSalaryDistribution() {
+  async getSalaryDistribution(filters: ReportFilterQueryDto = {}) {
+    const whereClause = this.buildReportWhereClause(filters);
     const result = await this.prisma.$queryRaw<
       {
         salaryRange: string;
@@ -113,7 +132,7 @@ export class ReportsService {
     FROM "Employee" e
     JOIN "ExchangeRate" r
       ON r."currencyCode" = e."currencyCode"
-    WHERE e.status = 'ACTIVE'
+    WHERE ${whereClause}
     GROUP BY
       CASE
         WHEN e.salary * r."rateToBase" < 2000000 THEN '0-2M'

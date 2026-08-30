@@ -1,12 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
 import { ReportsService } from './reports.service';
+import { Prisma } from '../../generated/prisma/client';
 
 describe('ReportsService', () => {
   let service: ReportsService;
 
+  const queryRawMock = jest.fn<Promise<unknown[]>, [Prisma.Sql]>();
+
   const prisma = {
-    $queryRaw: jest.fn(),
+    $queryRaw: queryRawMock,
   };
 
   beforeEach(async () => {
@@ -107,6 +110,29 @@ describe('ReportsService', () => {
         },
       ]);
     });
+
+    it('applies report filters to department breakdown', async () => {
+      const breakdown = [
+        {
+          department: 'Engineering',
+          totalPayroll: 400450000,
+          averageSalary: 1779777.7777777778,
+          employeeCount: 225,
+        },
+      ];
+
+      prisma.$queryRaw.mockResolvedValue(breakdown);
+
+      await service.getDepartmentBreakdown({
+        department: 'Engineering',
+        country: 'India',
+      });
+
+      const query = queryRawMock.mock.calls[0][0];
+
+      expect(query.values).toContain('Engineering');
+      expect(query.values).toContain('India');
+    });
   });
 
   describe('getCountryBreakdown', () => {
@@ -145,6 +171,29 @@ describe('ReportsService', () => {
         },
       ]);
     });
+
+    it('applies report filters to country breakdown', async () => {
+      const breakdown = [
+        {
+          country: 'India',
+          totalPayroll: 400450000,
+          averageSalary: 1779777.7777777778,
+          employeeCount: 225,
+        },
+      ];
+
+      prisma.$queryRaw.mockResolvedValue(breakdown);
+
+      await service.getCountryBreakdown({
+        department: 'Engineering',
+        country: 'India',
+      });
+
+      const query = queryRawMock.mock.calls[0][0];
+
+      expect(query.values).toContain('Engineering');
+      expect(query.values).toContain('India');
+    });
   });
 
   describe('getSalaryDistribution', () => {
@@ -174,5 +223,54 @@ describe('ReportsService', () => {
         distribution,
       );
     });
+
+    it('applies report filters to salary distribution', async () => {
+      const distribution = [
+        {
+          salaryRange: '0-2M',
+          employeeCount: 225,
+        },
+      ];
+
+      prisma.$queryRaw.mockResolvedValue(distribution);
+
+      await service.getSalaryDistribution({
+        department: 'Engineering',
+        country: 'India',
+      });
+
+      const query = queryRawMock.mock.calls[0][0];
+
+      expect(query.values).toContain('Engineering');
+      expect(query.values).toContain('India');
+    });
+  });
+
+  it('applies department and country filters to payroll summary', async () => {
+    const summary = {
+      totalPayroll: 9000000,
+      averageSalary: 900000,
+      medianSalary: 850000,
+      employeeCount: 10,
+    };
+
+    prisma.$queryRaw.mockResolvedValue([summary]);
+
+    await expect(
+      service.getPayrollSummary({
+        department: 'Engineering',
+        country: 'India',
+      }),
+    ).resolves.toEqual({
+      ...summary,
+      currencyCode: 'INR',
+    });
+
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
+
+    const query = queryRawMock.mock.calls[0][0];
+
+    expect(query.values).toContain('Engineering');
+    expect(query.values).toContain('India');
   });
 });
