@@ -432,4 +432,53 @@ describe('EmployeesService', () => {
       );
     });
   });
+
+  describe('activate', () => {
+    it('should mark an employee as active', async () => {
+      prismaMock.employee.update.mockResolvedValue({
+        id: 1,
+        employeeCode: 'EMP001',
+        firstName: 'Amit',
+        lastName: 'Sharma',
+        email: 'amit.sharma@example.com',
+        department: 'Engineering',
+        country: 'India',
+        jobTitle: 'Software Engineer',
+        salary: 1000000,
+        currencyCode: 'INR',
+        status: 'ACTIVE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const result = await service.activate(1);
+
+      expect(prismaMock.employee.update).toHaveBeenCalledWith({
+        where: {
+          id: 1,
+        },
+        data: {
+          status: 'ACTIVE',
+        },
+      });
+
+      expect(result.status).toBe('ACTIVE');
+    });
+
+    it('should return not found when activating an employee that does not exist', async () => {
+      prismaMock.employee.update.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError(
+          'Record to update not found.',
+          {
+            code: 'P2025',
+            clientVersion: '7.10.0',
+          },
+        ),
+      );
+
+      await expect(service.activate(99999)).rejects.toThrow(
+        'Employee not found',
+      );
+    });
+  });
 });

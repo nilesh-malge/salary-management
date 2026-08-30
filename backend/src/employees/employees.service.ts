@@ -90,6 +90,17 @@ export class EmployeesService {
     }
   }
 
+  async activate(id: number): Promise<Employee> {
+    try {
+      return await this.prisma.employee.update({
+        where: { id },
+        data: { status: EmployeeStatus.ACTIVE },
+      });
+    } catch (error) {
+      this.handleEmployeeWriteError(error);
+    }
+  }
+
   async findAll({
     page,
     pageSize,

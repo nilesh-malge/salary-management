@@ -11,6 +11,7 @@ describe('EmployeesController', () => {
     findAll: jest.fn(),
     update: jest.fn(),
     deactivate: jest.fn(),
+    activate: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -113,6 +114,33 @@ describe('EmployeesController', () => {
       const result = await controller.deactivate(1);
 
       expect(employeesServiceMock.deactivate).toHaveBeenCalledWith(1);
+      expect(result).toEqual(response);
+    });
+  });
+
+  describe('activate', () => {
+    it('should activate an employee', async () => {
+      const response = {
+        id: 1,
+        employeeCode: 'EMP001',
+        firstName: 'Amit',
+        lastName: 'Sharma',
+        email: 'amit.sharma@example.com',
+        department: 'Engineering',
+        country: 'India',
+        jobTitle: 'Software Engineer',
+        salary: 1000000,
+        currencyCode: 'INR',
+        status: 'ACTIVE',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      employeesServiceMock.activate.mockResolvedValue(response);
+
+      const result = await controller.activate(1);
+
+      expect(employeesServiceMock.activate).toHaveBeenCalledWith(1);
       expect(result).toEqual(response);
     });
   });
