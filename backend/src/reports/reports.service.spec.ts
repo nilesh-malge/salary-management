@@ -146,4 +146,33 @@ describe('ReportsService', () => {
       ]);
     });
   });
+
+  describe('getSalaryDistribution', () => {
+    it('returns salary distribution in INR', async () => {
+      const distribution = [
+        {
+          salaryRange: '0-2M',
+          employeeCount: 1200,
+        },
+        {
+          salaryRange: '2M-5M',
+          employeeCount: 2800,
+        },
+        {
+          salaryRange: '5M-10M',
+          employeeCount: 3500,
+        },
+        {
+          salaryRange: '10M+',
+          employeeCount: 2000,
+        },
+      ];
+
+      prisma.$queryRaw.mockResolvedValue(distribution);
+
+      await expect(service.getSalaryDistribution()).resolves.toEqual(
+        distribution,
+      );
+    });
+  });
 });

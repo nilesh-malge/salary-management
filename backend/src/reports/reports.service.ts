@@ -94,4 +94,37 @@ export class ReportsService {
       currencyCode: 'INR',
     }));
   }
+
+  async getSalaryDistribution() {
+    const result = await this.prisma.$queryRaw<
+      {
+        salaryRange: string;
+        employeeCount: number;
+      }[]
+    >(Prisma.sql`
+    SELECT
+      CASE
+        WHEN e.salary * r."rateToBase" < 2000000 THEN '0-2M'
+        WHEN e.salary * r."rateToBase" < 5000000 THEN '2M-5M'
+        WHEN e.salary * r."rateToBase" < 10000000 THEN '5M-10M'
+        ELSE '10M+'
+      END AS "salaryRange",
+      COUNT(*)::int AS "employeeCount"
+    FROM "Employee" e
+    JOIN "ExchangeRate" r
+      ON r."currencyCode" = e."currencyCode"
+    WHERE e.status = 'ACTIVE'
+    GROUP BY
+      CASE
+        WHEN e.salary * r."rateToBase" < 2000000 THEN '0-2M'
+        WHEN e.salary * r."rateToBase" < 5000000 THEN '2M-5M'
+        WHEN e.salary * r."rateToBase" < 10000000 THEN '5M-10M'
+        ELSE '10M+'
+      END
+    ORDER BY
+      MIN(e.salary * r."rateToBase")
+  `);
+
+    return result;
+  }
 }

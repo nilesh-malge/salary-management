@@ -19,4 +19,9 @@ export class ReportsController {
   async getCountryBreakdown() {
     return this.reportsService.getCountryBreakdown();
   }
+
+  @Get('salary-distribution')
+  async getSalaryDistribution() {
+    return this.reportsService.getSalaryDistribution();
+  }
 }

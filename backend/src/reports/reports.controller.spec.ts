@@ -9,6 +9,7 @@ describe('ReportsController', () => {
     getPayrollSummary: jest.fn(),
     getDepartmentBreakdown: jest.fn(),
     getCountryBreakdown: jest.fn(),
+    getSalaryDistribution: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -85,6 +86,37 @@ describe('ReportsController', () => {
       );
 
       expect(reportsService.getCountryBreakdown).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getSalaryDistribution', () => {
+    it('returns salary distribution', async () => {
+      const distribution = [
+        {
+          salaryRange: '0-2M',
+          employeeCount: 1200,
+        },
+        {
+          salaryRange: '2M-5M',
+          employeeCount: 2800,
+        },
+        {
+          salaryRange: '5M-10M',
+          employeeCount: 3500,
+        },
+        {
+          salaryRange: '10M+',
+          employeeCount: 2000,
+        },
+      ];
+
+      reportsService.getSalaryDistribution.mockResolvedValue(distribution);
+
+      await expect(controller.getSalaryDistribution()).resolves.toEqual(
+        distribution,
+      );
+
+      expect(reportsService.getSalaryDistribution).toHaveBeenCalledTimes(1);
     });
   });
 });
