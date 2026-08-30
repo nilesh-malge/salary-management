@@ -6,7 +6,13 @@ import { EditEmployeeForm } from "@/components/edit-employee-form";
 import { EmployeeTable } from "@/components/employee-table";
 import type { Employee } from "@/types/employees";
 
-export function EmployeeManagement() {
+type EmployeeManagementProps = {
+  onEmployeeChanged?: () => void;
+};
+
+export function EmployeeManagement({
+  onEmployeeChanged,
+}: EmployeeManagementProps) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
     null,
@@ -14,6 +20,7 @@ export function EmployeeManagement() {
 
   function refreshEmployees() {
     setRefreshKey((current) => current + 1);
+    onEmployeeChanged?.();
   }
 
   function handleEmployeeCreated() {
@@ -41,6 +48,7 @@ export function EmployeeManagement() {
       <EmployeeTable
         refreshKey={refreshKey}
         onEditEmployee={setSelectedEmployee}
+        onEmployeeStatusChanged={refreshEmployees}
       />
     </div>
   );

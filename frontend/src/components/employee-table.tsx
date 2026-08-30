@@ -17,6 +17,7 @@ import type {
 type EmployeeTableProps = {
   refreshKey?: number;
   onEditEmployee?: (employee: Employee) => void;
+  onEmployeeStatusChanged?: () => void;
 };
 
 function formatSalary(salary: string, currencyCode: string) {
@@ -30,6 +31,7 @@ function formatSalary(salary: string, currencyCode: string) {
 export function EmployeeTable({
   refreshKey = 0,
   onEditEmployee,
+  onEmployeeStatusChanged,
 }: EmployeeTableProps) {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [page, setPage] = useState(1);
@@ -58,6 +60,7 @@ export function EmployeeTable({
       await deactivateEmployee(employee.id);
       setPage(1);
       setReloadKey((current) => current + 1);
+      onEmployeeStatusChanged?.();
     } catch (error) {
       window.alert(
         error instanceof Error
@@ -80,6 +83,7 @@ export function EmployeeTable({
       await activateEmployee(employee.id);
       setPage(1);
       setReloadKey((current) => current + 1);
+      onEmployeeStatusChanged?.();
     } catch (error) {
       window.alert(
         error instanceof Error

@@ -25,7 +25,11 @@ const countries = [
   "United States",
 ];
 
-export function Dashboard() {
+type DashboardProps = {
+  refreshKey?: number;
+};
+
+export function Dashboard({ refreshKey = 0 }: DashboardProps) {
   const [filters, setFilters] = useState<ReportFilters>({});
 
   function updateFilter(name: keyof ReportFilters, value: string) {
@@ -75,14 +79,17 @@ export function Dashboard() {
         </label>
       </div>
 
-      <PayrollSummaryCards filters={filters} />
+      <PayrollSummaryCards key={`summary-${refreshKey}`} filters={filters} />
 
       <div className="mt-8">
-        <PayrollBreakdown filters={filters} />
+        <PayrollBreakdown key={`breakdown-${refreshKey}`} filters={filters} />
       </div>
 
       <div className="mt-8">
-        <SalaryDistributionChart filters={filters} />
+        <SalaryDistributionChart
+          key={`distribution-${refreshKey}`}
+          filters={filters}
+        />
       </div>
     </>
   );

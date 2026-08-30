@@ -1,7 +1,16 @@
+"use client";
+
+import { useState } from "react";
 import { Dashboard } from "@/components/dashboard";
 import { EmployeeManagement } from "@/components/employee-management";
 
 export default function Home() {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  function handleEmployeeChanged() {
+    setRefreshKey((current) => current + 1);
+  }
+
   return (
     <main className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
@@ -25,9 +34,9 @@ export default function Home() {
           </p>
         </div>
 
-        <Dashboard />
+        <Dashboard refreshKey={refreshKey} />
         <div className="mt-10">
-          <EmployeeManagement />
+          <EmployeeManagement onEmployeeChanged={handleEmployeeChanged} />
         </div>
       </section>
     </main>
