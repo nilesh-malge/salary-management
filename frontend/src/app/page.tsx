@@ -1,5 +1,5 @@
 import { Dashboard } from "@/components/dashboard";
-import { EmployeeTable } from "@/components/employee-table";
+import { EmployeeManagement } from "@/components/employee-management";
 
 export default function Home() {
   return (
@@ -27,7 +27,7 @@ export default function Home() {
 
         <Dashboard />
         <div className="mt-10">
-          <EmployeeTable />
+          <EmployeeManagement />
         </div>
       </section>
     </main>

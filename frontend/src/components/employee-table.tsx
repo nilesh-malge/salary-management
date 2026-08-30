@@ -10,6 +10,10 @@ import type {
   SortOrder,
 } from "@/types/employees";
 
+type EmployeeTableProps = {
+  refreshKey?: number;
+};
+
 function formatSalary(salary: string, currencyCode: string) {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -18,7 +22,7 @@ function formatSalary(salary: string, currencyCode: string) {
   }).format(Number(salary));
 }
 
-export function EmployeeTable() {
+export function EmployeeTable({ refreshKey = 0 }: EmployeeTableProps) {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -58,7 +62,16 @@ export function EmployeeTable() {
     }
 
     void loadEmployees();
-  }, [page, search, department, country, status, sortBy, sortOrder]);
+  }, [
+    page,
+    search,
+    department,
+    country,
+    status,
+    sortBy,
+    sortOrder,
+    refreshKey,
+  ]);
 
   function resetPage() {
     setPage(1);

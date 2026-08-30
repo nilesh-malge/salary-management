@@ -1,4 +1,6 @@
 import type {
+  CreateEmployeeInput,
+  Employee,
   EmployeeListParams,
   EmployeeListResponse,
 } from "@/types/employees";
@@ -52,4 +54,30 @@ export async function getEmployees(
   }
 
   return response.json() as Promise<EmployeeListResponse>;
+}
+
+export async function createEmployee(
+  input: CreateEmployeeInput,
+): Promise<Employee> {
+  const response = await fetch(`${API_URL}/employees`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    const error = (await response.json()) as {
+      message?: string | string[];
+    };
+
+    const message = Array.isArray(error.message)
+      ? error.message.join(", ")
+      : error.message;
+
+    throw new Error(message || "Unable to create employee");
+  }
+
+  return response.json() as Promise<Employee>;
 }
