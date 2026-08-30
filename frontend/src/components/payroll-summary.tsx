@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getPayrollSummary } from "@/lib/api";
-import type { PayrollSummary } from "@/types/reports";
+import type { PayrollSummary, ReportFilters } from "@/types/reports";
 
 function formatCurrency(value: number, currencyCode: string) {
   return new Intl.NumberFormat("en-IN", {
@@ -12,14 +12,14 @@ function formatCurrency(value: number, currencyCode: string) {
   }).format(value);
 }
 
-export function PayrollSummaryCards() {
+export function PayrollSummaryCards({ filters }: { filters: ReportFilters }) {
   const [summary, setSummary] = useState<PayrollSummary | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadSummary() {
       try {
-        const data = await getPayrollSummary();
+        const data = await getPayrollSummary(filters);
         setSummary(data);
       } catch {
         setError("Payroll summary could not be loaded.");
@@ -27,7 +27,7 @@ export function PayrollSummaryCards() {
     }
 
     void loadSummary();
-  }, []);
+  }, [filters]);
 
   if (error) {
     return (

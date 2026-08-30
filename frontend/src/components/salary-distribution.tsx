@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { getSalaryDistribution } from "@/lib/api";
-import type { SalaryDistribution } from "@/types/reports";
+import type { ReportFilters, SalaryDistribution } from "@/types/reports";
 
-export function SalaryDistributionChart() {
+export function SalaryDistributionChart({
+  filters,
+}: {
+  filters: ReportFilters;
+}) {
   const [distribution, setDistribution] = useState<SalaryDistribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -12,7 +16,7 @@ export function SalaryDistributionChart() {
   useEffect(() => {
     async function loadDistribution() {
       try {
-        const data = await getSalaryDistribution();
+        const data = await getSalaryDistribution(filters);
         setDistribution(data);
       } catch {
         setError("Salary distribution could not be loaded.");
@@ -22,7 +26,7 @@ export function SalaryDistributionChart() {
     }
 
     void loadDistribution();
-  }, []);
+  }, [filters]);
 
   if (loading) {
     return (

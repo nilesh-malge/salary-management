@@ -26,3 +26,8 @@ export type SalaryDistribution = {
   salaryRange: string;
   employeeCount: number;
 };
+
+export type ReportFilters = {
+  department?: string;
+  country?: string;
+};

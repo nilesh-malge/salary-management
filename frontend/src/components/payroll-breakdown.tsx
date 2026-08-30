@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { getCountryPayroll, getDepartmentPayroll } from "@/lib/api";
-import type { CountryPayroll, DepartmentPayroll } from "@/types/reports";
+import type {
+  CountryPayroll,
+  DepartmentPayroll,
+  ReportFilters,
+} from "@/types/reports";
 
 function formatCurrency(value: number, currencyCode: string) {
   return new Intl.NumberFormat("en-IN", {
@@ -12,7 +16,7 @@ function formatCurrency(value: number, currencyCode: string) {
   }).format(value);
 }
 
-export function PayrollBreakdown() {
+export function PayrollBreakdown({ filters }: { filters: ReportFilters }) {
   const [departments, setDepartments] = useState<DepartmentPayroll[]>([]);
   const [countries, setCountries] = useState<CountryPayroll[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,8 +26,8 @@ export function PayrollBreakdown() {
     async function loadBreakdowns() {
       try {
         const [departmentData, countryData] = await Promise.all([
-          getDepartmentPayroll(),
-          getCountryPayroll(),
+          getDepartmentPayroll(filters),
+          getCountryPayroll(filters),
         ]);
 
         setDepartments(departmentData);
@@ -36,7 +40,7 @@ export function PayrollBreakdown() {
     }
 
     void loadBreakdowns();
-  }, []);
+  }, [filters]);
 
   if (loading) {
     return (
