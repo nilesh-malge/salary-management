@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AddEmployeeForm } from "@/components/add-employee-form";
 import { EditEmployeeForm } from "@/components/edit-employee-form";
 import { EmployeeTable } from "@/components/employee-table";
@@ -18,6 +18,17 @@ export function EmployeeManagement({
     null,
   );
 
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (selectedEmployee) {
+      formRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [selectedEmployee]);
+
   function refreshEmployees() {
     setRefreshKey((current) => current + 1);
     onEmployeeChanged?.();
@@ -34,16 +45,18 @@ export function EmployeeManagement({
 
   return (
     <div className="space-y-8">
-      {selectedEmployee ? (
-        <EditEmployeeForm
-          key={selectedEmployee.id}
-          employee={selectedEmployee}
-          onUpdated={handleEmployeeUpdated}
-          onCancel={() => setSelectedEmployee(null)}
-        />
-      ) : (
-        <AddEmployeeForm onEmployeeCreated={handleEmployeeCreated} />
-      )}
+      <div ref={formRef}>
+        {selectedEmployee ? (
+          <EditEmployeeForm
+            key={selectedEmployee.id}
+            employee={selectedEmployee}
+            onUpdated={handleEmployeeUpdated}
+            onCancel={() => setSelectedEmployee(null)}
+          />
+        ) : (
+          <AddEmployeeForm onEmployeeCreated={handleEmployeeCreated} />
+        )}
+      </div>
 
       <EmployeeTable
         refreshKey={refreshKey}
