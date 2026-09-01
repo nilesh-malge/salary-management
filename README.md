@@ -2,6 +2,10 @@
 
 Salary Management is a small internal application for an HR Manager to maintain employee salary information and view payroll reports for a workforce of around 10,000 employees.
 
+## Deployment
+
+[Live Application](https://salary-management-nilesh24.vercel.app)
+
 The project has a Next.js frontend, a NestJS REST API, and PostgreSQL through Prisma.
 
 I kept the backend as a modular monolith. At the current scope and data size, splitting employee management and reporting into separate services would add deployment and communication overhead without solving a problem the application currently has.
@@ -356,11 +360,3 @@ If the application were taken further, I would consider:
 - additional database indexes based on measured query patterns
 
 I would add these based on actual product requirements rather than introducing them into the MVP in advance.
-
-## Deployment
-
-Deployment URL will be added here after deployment.
-
-## Demo
-
-Demo video link will be added here before submission.
